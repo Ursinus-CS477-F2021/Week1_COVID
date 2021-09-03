@@ -35,7 +35,13 @@ class Person:
         """
         # Update cylinder position
         self.cylinder.pos = vector(self.x, 0, self.y)
-        ## TODO: Update cylinder color, as appropriate
+        ## Update cylinder color, as appropriate
+        if self.state == HEALTHY:
+            self.cylinder.color = BLUE
+        elif self.state == INFECTED:
+            self.cylinder.color = RED
+        else:
+            self.cylinder.color = MAGENTA
     
     def timestep(self, dt):
         """
