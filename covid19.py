@@ -9,6 +9,8 @@ HEALTHY = 0
 INFECTED = 1
 RECOVERED = 2
 
+RECOVERY_TIME = 20 # Recovery time, in seconds
+
 class Person:
     def __init__(self, res, state):
         """
@@ -27,6 +29,7 @@ class Person:
         # Create a cylinder to draw this person in vpython
         self.cylinder = cylinder(pos=vector(self.x, 0, self.y), axis=vector(0, np.sqrt(res), 0), radius=res/100, color=BLUE)
         self.state = state
+        self.time_sick = 0
 
     def redraw(self):
         """
@@ -62,7 +65,10 @@ class Person:
         if np.abs(self.y) > self.res:
             self.y = np.sign(self.y)*self.res
             self.vy *= -1
-        ## TODO: Keep track of how long a person has been sick
+        if self.state == INFECTED:
+            self.time_sick += dt
+            if self.time_sick > RECOVERY_TIME:
+                self.state = RECOVERED
 
     def infect(self, other, infect_radius):
         """
