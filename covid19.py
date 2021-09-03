@@ -64,6 +64,24 @@ class Person:
             self.vy *= -1
         ## TODO: Keep track of how long a person has been sick
 
+    def infect(self, other, infect_radius):
+        """
+        Parameters
+        ----------
+        other: Person
+            A person object of someone who could potentially infect self
+            if other is infected and self is healthy and they are both
+            close enough
+        infect_radius: float
+            The distance two people have to be apart in order for transmission to happen
+        """
+        if self.state == HEALTHY and other.state == INFECTED:
+            dx = self.x - other.x
+            dy = self.y - other.y
+            dist = (dx**2 + dy**2)**0.5
+            if dist < infect_radius:
+                self.state = INFECTED
+
     def __str__(self):
         return "Person at ({:.3f}, {:.3f}) going {:.3f}, {:.3f}".format(self.x, self.y, self.vx, self.vy)
 
