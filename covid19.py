@@ -11,6 +11,8 @@ RECOVERED = 2
 
 RECOVERY_TIME = 20 # Recovery time, in seconds
 
+from scipy import spatial
+
 class Person:
     def __init__(self, res, state, moving = True):
         """
@@ -79,7 +81,7 @@ class Person:
             if self.time_sick > RECOVERY_TIME:
                 self.state = RECOVERED
 
-    def infect(self, other, infect_radius):
+    def infect(self, other):
         """
         Parameters
         ----------
@@ -87,15 +89,9 @@ class Person:
             A person object of someone who could potentially infect self
             if other is infected and self is healthy and they are both
             close enough
-        infect_radius: float
-            The distance two people have to be apart in order for transmission to happen
         """
         if self.state == HEALTHY and other.state == INFECTED:
-            dx = self.x - other.x
-            dy = self.y - other.y
-            dist = (dx**2 + dy**2)**0.5
-            if dist < infect_radius:
-                self.state = INFECTED
+            self.state = INFECTED
 
     def __str__(self):
         return "Person at ({:.3f}, {:.3f}) going {:.3f}, {:.3f}".format(self.x, self.y, self.vx, self.vy)
@@ -129,10 +125,15 @@ def do_simulation(num_people, num_moving, res, infect_radius):
         this_time = clock()
         dt = this_time - last_time
         last_time = this_time
-        for p in people:
-            for q in people:
-                p.infect(q, infect_radius)
+        # Setup KDTree
+        X = [[p.x, p.y] for p in people]
+        tree = spatial.KDTree(X)
+        for i, p in enumerate(people):
+            # Use KDTree to quickly search for people within
+            # the infection radius
+            for j in tree.query_ball_point(X[i], infect_radius):
+                p.infect(people[j])
             p.timestep(dt)
             p.redraw()
 
-do_simulation(200, 30, 100, 5)
+do_simulation(2000, 100, 100, 5)
