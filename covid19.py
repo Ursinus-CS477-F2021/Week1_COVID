@@ -5,8 +5,12 @@ RED = vector(1, 0, 0)
 MAGENTA = vector(1, 0, 1)
 BLUE = vector(0, 0.5, 1)
 
+HEALTHY = 0
+INFECTED = 1
+RECOVERED = 2
+
 class Person:
-    def __init__(self, res):
+    def __init__(self, res, state):
         """
         The constructor for a person
 
@@ -22,7 +26,8 @@ class Person:
         [self.vx, self.vy] = np.random.randn(2)*res/24
         # Create a cylinder to draw this person in vpython
         self.cylinder = cylinder(pos=vector(self.x, 0, self.y), axis=vector(0, np.sqrt(res), 0), radius=res/100, color=BLUE)
-    
+        self.state = state
+
     def redraw(self):
         """
         Update the drawing of this person to reflect any of
@@ -72,9 +77,9 @@ def do_simulation(num_people, res, infect_radius):
     scene.camera.pos = vector(0, res*2, 0)
     scene.camera.axis = -scene.camera.pos
     print(scene.camera)
-    people = []
-    for i in range(num_people):
-        people.append(Person(res))
+    people = [Person(res, INFECTED)] # First person is sick
+    for i in range(num_people-1): 
+        people.append(Person(res, HEALTHY)) # Everyone else is healthy
     last_time = clock()
     while True: # Animation loop
         this_time = clock()
