@@ -12,7 +12,7 @@ RECOVERED = 2
 RECOVERY_TIME = 20 # Recovery time, in seconds
 
 class Person:
-    def __init__(self, res, state):
+    def __init__(self, res, state, moving = True):
         """
         The constructor for a person
 
@@ -20,12 +20,21 @@ class Person:
         ----------
         res: float
             The size of a square grid on which to have people moving
+        state: int
+            The health state of the person
+        moving: boolean
+            Whether the person is moving
         """
         self.res = res
         # Create an initially random position
         [self.x, self.y] = (2*np.random.rand(2)-1)*res
         # Create an initial random velocity
-        [self.vx, self.vy] = np.random.randn(2)*res/24
+        if moving:
+            [self.vx, self.vy] = np.random.randn(2)*res/24
+        else:
+            # Zero velocity for nonmoving person
+            self.vx = 0
+            self.vy = 0
         # Create a cylinder to draw this person in vpython
         self.cylinder = cylinder(pos=vector(self.x, 0, self.y), axis=vector(0, np.sqrt(res), 0), radius=res/100, color=BLUE)
         self.state = state
@@ -92,12 +101,14 @@ class Person:
         return "Person at ({:.3f}, {:.3f}) going {:.3f}, {:.3f}".format(self.x, self.y, self.vx, self.vy)
 
 
-def do_simulation(num_people, res, infect_radius):
+def do_simulation(num_people, num_moving, res, infect_radius):
     """
     Parameters
     ----------
     num_people: int
         The number of people in the simulation
+    num_moving: int
+        The number of people who are actually moving
     res: float
         A slide length of the square grid that people are moving on
     infect_radius: float
@@ -109,7 +120,10 @@ def do_simulation(num_people, res, infect_radius):
     print(scene.camera)
     people = [Person(res, INFECTED)] # First person is sick
     for i in range(num_people-1): 
-        people.append(Person(res, HEALTHY)) # Everyone else is healthy
+        moving = False
+        if i < num_moving:
+            moving = True
+        people.append(Person(res, HEALTHY, moving)) # Everyone else is healthy
     last_time = clock()
     while True: # Animation loop
         this_time = clock()
@@ -121,4 +135,4 @@ def do_simulation(num_people, res, infect_radius):
             p.timestep(dt)
             p.redraw()
 
-do_simulation(200, 100, 5)
+do_simulation(200, 30, 100, 5)
