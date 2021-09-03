@@ -116,6 +116,8 @@ def do_simulation(num_people, res, infect_radius):
         dt = this_time - last_time
         last_time = this_time
         for p in people:
+            for q in people:
+                p.infect(q, infect_radius)
             p.timestep(dt)
             p.redraw()
 
